@@ -1,24 +1,42 @@
 name: Continuous Integration
+
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
-  
+
 permissions: write-all
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
+
+      # Installer la version Python compatible
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      # Installer CML pour les commentaires
       - uses: iterative/setup-cml@v2
+
+      # Installer les packages Python
       - name: Install Packages
         run: make install
+
+      # Vérifier le format du code
       - name: Format
         run: make format
+
+      # Entraîner le modèle
       - name: Train
         run: make train
+
+      # Évaluer le modèle et publier le rapport
       - name: Evaluation
         env:
           REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
